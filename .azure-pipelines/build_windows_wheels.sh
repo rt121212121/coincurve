@@ -12,22 +12,24 @@ build_dll() {
 # Step up above the git repo checkout directory.
 pushd ..
 git clone https://github.com/electrumsv/secp256k1
+# Keep synchronised with 'setup.py' located commit used by Linux/MacOS.
+git checkout 314a61d72474aa29ff4afba8472553ad91d88e9d
 
-mv secp256k1 64bit
-cp 64bit 32bit -R
-
-cd 64bit
-build_dll x86_64-w64-mingw32
-mv .libs/libsecp256k1-0.dll ../clean/electrumsv_secp256k1/libsecp256k1.dll
-cd ../clean
-python setup.py bdist_wheel --universal --plat-name=win_amd64
-rm electrumsv_secp256k1/libsecp256k1.dll
-
-cd ../32bit
-build_dll i686-w64-mingw32
-mv .libs/libsecp256k1-0.dll ../clean/electrumsv_secp256k1/libsecp256k1.dll
-cd ../clean
-python setup.py bdist_wheel --universal --plat-name=win32
+if [[ "${LINUX_TARGET}" == "win32" ]]; then
+    mv secp256k1 32bit
+    cd 32bit
+    build_dll i686-w64-mingw32
+    mv .libs/libsecp256k1-0.dll ../clean/electrumsv_secp256k1/libsecp256k1.dll
+    cd ../clean
+    python setup.py bdist_wheel --universal --plat-name=win32
+elif [[ "${LINUX_TARGET}" == "win64" ]]; then
+    mv secp256k1 64bit
+    cd 64bit
+    build_dll x86_64-w64-mingw32
+    mv .libs/libsecp256k1-0.dll ../clean/electrumsv_secp256k1/libsecp256k1.dll
+    cd ../clean
+    python setup.py bdist_wheel --universal --plat-name=win_amd64
+fi
 
 mv dist/* $BUILD_SOURCESDIRECTORY/dist/
 popd

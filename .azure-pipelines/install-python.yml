@@ -1,0 +1,15 @@
+steps:
+- task: UsePythonVersion@0
+  name: setupPython37
+  inputs:
+    versionSpec: 3.7
+    addToPath: true
+    architecture: x64
+  # Outputs to: SETUPPYTHON37_PYTHONLOCATION
+- task: UsePythonVersion@0
+  name: setupPython36
+  inputs:
+    versionSpec: 3.6
+    addToPath: true
+    architecture: x64
+  # Outputs to: SETUPPYTHON36_PYTHONLOCATION
