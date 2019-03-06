@@ -27,7 +27,6 @@ jobs:
   steps:
   - template: install-python.yml
   - template: prepare-general-environment.yml
-  - template: prepare-windows-environment.yml
   - template: build.yml
   - task: PublishPipelineArtifact@0
     inputs:
@@ -41,7 +40,6 @@ jobs:
   steps:
   - template: install-python.yml
   - template: prepare-general-environment.yml
-  - template: prepare-windows-environment.yml
   - template: build.yml
   - task: PublishPipelineArtifact@0
     inputs:
@@ -55,7 +53,6 @@ jobs:
   steps:
   - template: install-python.yml
   - template: prepare-general-environment.yml
-  - template: prepare-windows-environment.yml
   - template: build.yml
   - task: PublishPipelineArtifact@0
     inputs:
@@ -95,46 +92,9 @@ jobs:
   pool:
     vmImage: 'macOS-10.13'
   steps:
-  - task: UsePythonVersion@0
-    name: AzPy37
-    inputs:
-      versionSpec: 3.7
-      addToPath: true
-      architecture: x64
-  - task: UsePythonVersion@0
-    name: AzPy36
-    inputs:
-      versionSpec: 3.6
-      addToPath: true
-      architecture: x64
-  - script: |
-      # update brew
-      brew update || brew update
-      # Update openssl if necessary
-      brew outdated openssl || brew upgrade openssl
-      # Install packages needed to build lib-secp256k1
-      for pkg in automake libtool pkg-config libffi; do
-          brew list $pkg > /dev/null || brew install $pkg
-          brew outdated --quiet $pkg || brew upgrade $pkg
-      done
-      pip install -U wheel cffi
-      chmod +x .azure-pipelines/*.sh
-    displayName: Prepare general environment
-    enabled: true
-    continueOnError: false
-    failOnStderr: false
-  - script: |
-      .azure-pipelines/deploy.sh
-    displayName: Deploy
-    enabled: true
-    continueOnError: false
-    failOnStderr: false
-  - task: CopyFiles@2
-    inputs:
-      contents: dist/?(*.whl|*.gz)
-      targetFolder: $(Build.ArtifactStagingDirectory)
-      flattenFolders: true
-      OverWrite: true
+  - template: install-python.yml
+  - template: prepare-macos-environment.yml
+  - template: build.yml
   - task: PublishPipelineArtifact@0
     inputs:
       artifactName: 'build-files-macos'
